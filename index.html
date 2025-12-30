@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 专属时光胶囊</title>
+    <style>
+        :root { --primary-color: #ff758c; --bg-color: #ff758c; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+        
+        /* 渐变背景 */
+        body {
+            background-image: linear-gradient(120deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            display: flex; justify-content: center; align-items: center; color: white;
+        }
+
+        .container { text-align: center; padding: 20px; z-index: 10; width: 90%; max-width: 400px; }
+        
+        /* 倒计时样式 */
+        .timer-box { font-size: 1.5rem; margin-top: 20px; background: rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 15px; backdrop-filter: blur(5px); }
+        #timer { font-size: 2rem; font-weight: bold; display: block; margin-top: 10px; }
+
+        /* 隐藏的内容卡片 */
+        .card {
+            background: white; color: #444; padding: 30px; border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: none;
+            animation: fadeIn 1.5s ease; text-align: left;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card h1 { color: var(--primary-color); text-align: center; font-size: 1.5rem; }
+        .card p { line-height: 1.8; font-size: 1rem; color: #666; }
+        .card img { width: 100%; border-radius: 15px; margin-top: 20px; }
+
+        /* 漂浮的小心心背景 */
+        .heart-bg { position: absolute; top: -10%; color: rgba(255,255,255,0.6); animation: flow 10s linear infinite; z-index: 1; }
+        @keyframes flow { to { transform: translateY(110vh) rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="lock-screen">
+    <h2 style="font-weight: 300;">距离 2026 年开启</h2>
+    <div class="timer-box">
+        我们共同的回忆盒
+        <span id="timer">计算中...</span>
+    </div>
+    <p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.8;">等到钟声敲响，这里会为你绽放 ✨</p>
+</div>
+
+<div class="container" id="content-screen" style="display:none;">
+    <div class="card">
+        <h1>🎉 2026年快乐！</h1>
+        <p id="letter-text">
+            亲爱的 [名字]：<br><br>
+            当你看到这段文字时，2026年的第一缕阳光（或者月光）已经照进了我们的生活。<br>
+            2025年，我们一起经历了很多...<br>
+            这些回忆我都存在了这个盒子里。<br><br>
+            <b>新的一年，愿我们依然岁岁常相见。</b>
+        </p>
+        <img src="our-photo.jpg" alt="我们的照片" onerror="this.style.display='none'">
+    </div>
+</div>
+
+<script>
+    // 创建背景爱心
+    function createHearts() {
+        const heart = document.createElement('div');
+        heart.classList.add('heart-bg');
+        heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = Math.random() * 5 + 5 + 's';
+        heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 10000);
+    }
+    setInterval(createHearts, 500);
+
+    function checkTime() {
+        const now = new Date();
+        const target = new Date('2026-01-01T00:00:00');
+        
+        if (now >= target) {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('content-screen').style.display = 'block';
+        } else {
+            const diff = target - now;
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            document.getElementById('timer').innerText = `${h}h : ${m}m : ${s}s`;
+        }
+    }
+    setInterval(checkTime, 1000);
+    checkTime();
+</script>
+</body>
+</html>
