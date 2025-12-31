@@ -3,57 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>测试预览 - 2026 时光胶囊</title>
+    <title>测试预览 - 我们的时光相册</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Helvetica Neue', sans-serif; }
-        body {
-            background: linear-gradient(120deg, #ff9a9e 0%, #fecfef 100%);
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            --card-bg: #fffef8;
+            --text-color: #5e4b40;
+            --accent-color: #a63d40; /* 复古深红 */
+            --border-color: #d9c5b2;
+        }
+
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Merriweather', serif; background: var(--bg-gradient); }
+
+        /* --- 复古滤镜层 --- */
+        .vintage-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 2;
+        }
+
+        .container {
             display: flex; justify-content: center; align-items: center;
+            height: 100vh; position: relative; z-index: 10;
         }
-        .container { text-align: center; z-index: 10; width: 85%; max-width: 400px; }
+
+        /* --- 卡片通用样式 --- */
         .card {
-            background: white; color: #444; padding: 25px; border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: left;
-            animation: fadeIn 1s ease;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 30px;
+            width: 85%; max-width: 450px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(94, 75, 64, 0.2), inset 0 0 20px rgba(226, 209, 195, 0.3);
+            border: 2px solid var(--border-color);
+            text-align: left;
+            display: none; /* 默认隐藏 */
+            position: relative;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        h1 { color: #ff758c; text-align: center; margin-top: 0; font-size: 1.5rem; }
-        .photo-box { width: 100%; height: 200px; background: #eee; border-radius: 10px; margin-top: 15px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-        .heart-bg { position: absolute; top: -10%; color: rgba(255,255,255,0.7); animation: flow 8s linear infinite; z-index: 1; pointer-events: none; }
+        
+        /* 激活页面的动画 */
+        .card.active-page {
+            display: block;
+            animation: vintageFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        @keyframes vintageFadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); filter: blur(2px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        h1 { color: var(--accent-color); text-align: center; margin-top: 0; font-weight: 700; letter-spacing: 1px; border-bottom: 2px dashed var(--border-color); padding-bottom: 15px; }
+        .content-text { line-height: 1.8; font-size: 1rem; white-space: pre-wrap; }
+
+        /* --- 照片框样式 --- */
+        .photo-frame {
+            margin-top: 20px; padding: 10px; background: #fff;
+            border: 1px solid var(--border-color);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg); /* 让照片稍微倾斜一点，更像手工贴的 */
+            transition: transform 0.3s ease;
+        }
+        .photo-frame:hover { transform: rotate(0deg) scale(1.02); }
+        .photo-frame img { width: 100%; display: block; border-radius: 4px; filter: sepia(0.3); /* 给照片加一点点怀旧色 */ }
+        .photo-caption { text-align: center; font-size: 0.8rem; color: #888; margin-top: 5px; font-style: italic; }
+
+        /* --- 按钮样式 --- */
+        .btn-next {
+            display: block; width: 100%; padding: 15px 0; margin-top: 25px;
+            background: var(--accent-color); color: #fffbe3; border: none;
+            border-radius: 8px; font-family: inherit; font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(166, 61, 64, 0.3); transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        .btn-next:hover { background-color: #8a3336; transform: translateY(-2px); }
+        .btn-next::after { content: '→'; margin-left: 10px; }
+
+        /* --- 漂浮背景动画 --- */
+        .floating-bg { position: absolute; top: -10%; opacity: 0.5; animation: flow linear infinite; z-index: 1; pointer-events: none; }
         @keyframes flow { to { transform: translateY(110vh) rotate(360deg); } }
     </style>
 </head>
 <body>
 
+<div class="vintage-overlay"></div>
+
 <div class="container">
-    <div class="card">
-        <h1>✨ 预览模式：信件内容</h1>
-        <div style="line-height: 1.6; color: #666;">
-            亲爱的：<br><br>
-            这就是明天 0 点解锁后的样子！<br>
-            如果图片没显示，检查一下图片文件名是否叫 <b>our-photo.jpg</b>。<br><br>
-            确认文字和排版没问题后，记得改回正式版。
+    <div class="card active-page" id="page1">
+        <h1>📜 章一：初见与相知</h1>
+        <div class="content-text">
+亲爱的：
+
+这是我们回忆录的第一页。
+（在这里写下你们刚认识时的故事，或者 2025 年年初的某个重要时刻...）
+
+就像那张旧照片一样，那一刻永远定格。
         </div>
-        <div class="photo-box">
-            <img src="our-photo.jpg" alt="我们的合影" onerror="this.parentElement.innerHTML='<p style=color:#999>图片加载失败<br>请确认仓库里有our-photo.jpg</p>'">
+        <div class="photo-frame">
+            <img src="photo1.jpg" alt="回忆照片1" onerror="this.src='https://via.placeholder.com/400x250/e2d1c3/5e4b40?text=请上传+photo1.jpg'">
+            <div class="photo-caption">图注：那是我们第一次...</div>
+        </div>
+        <button class="btn-next" onclick="nextPage(2)">翻开下一页</button>
+    </div>
+
+    <div class="card" id="page2">
+        <h1>🕰️ 章二：点滴与习惯</h1>
+        <div class="content-text">
+（在这里写下中间发生的故事，也许是某次旅行，也许是日常的琐碎温馨...）
+
+这些日子里的酸甜苦辣，都变成了我们之间的默契。
+        </div>
+        <div class="photo-frame" style="transform: rotate(1deg);"> <img src="photo2.jpg" alt="回忆照片2" onerror="this.src='https://via.placeholder.com/400x250/e2d1c3/5e4b40?text=请上传+photo2.jpg'">
+            <div class="photo-caption">图注：难忘的那一天</div>
+        </div>
+        <button class="btn-next" onclick="nextPage(3)">继续未来的旅程</button>
+    </div>
+
+    <div class="card" id="page3">
+        <h1>💌 终章：致 2026 的你</h1>
+        <div class="content-text">
+（在这里写下对未来的期许，和你想对她说的话...）
+
+2025 的故事讲完了，但我们的故事还在继续。
+新的一年，换我来好好照顾你。
+
+爱你的，[你的名字]
+        </div>
+        <div class="photo-frame" style="transform: rotate(-1deg);">
+            <img src="photo3.jpg" alt="回忆照片3" onerror="this.src='https://via.placeholder.com/400x250/e2d1c3/5e4b40?text=请上传+photo3.jpg'">
+            <div class="photo-caption">图注：我们，未完待续...</div>
+        </div>
+        <div style="text-align: center; margin-top: 30px; color: var(--accent-color); font-size: 1.5rem;">
+            ❤ Forever ❤
         </div>
     </div>
 </div>
 
 <script>
-    // 飘心背景动画
-    function createHearts() {
-        const heart = document.createElement('div');
-        heart.classList.add('heart-bg');
-        heart.innerHTML = '❤️';
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
-        heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 8000);
+    // --- 页面切换逻辑 ---
+    function nextPage(pageNum) {
+        // 1. 找到当前显示的页面，移除 active 类，让它消失
+        document.querySelector('.card.active-page').classList.remove('active-page');
+        
+        // 2. 稍微延迟一点点，显示下一个页面，制造流畅感
+        setTimeout(() => {
+             document.getElementById('page' + pageNum).classList.add('active-page');
+        }, 100);
     }
-    setInterval(createHearts, 400);
+
+    // --- 漂浮背景动画 (红心 + 时钟) ---
+    const icons = ['❤️', '🕰️']; // 可以添加更多复古emoji，如 📜, 🎞️
+    function createFloatingItems() {
+        const item = document.createElement('div');
+        item.classList.add('floating-bg');
+        item.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+        item.style.left = Math.random() * 100 + 'vw';
+        item.style.fontSize = (Math.random() * 15 + 10) + 'px';
+        // 随机颜色深浅，增加层次感
+        item.style.color = Math.random() > 0.5 ? 'rgba(166, 61, 64, 0.4)' : 'rgba(94, 75, 64, 0.3)'; 
+        item.style.animationDuration = (Math.random() * 8 + 8) + 's';
+        document.body.appendChild(item);
+        setTimeout(() => item.remove(), 16000);
+    }
+    setInterval(createFloatingItems, 800);
 </script>
 </body>
 </html>
