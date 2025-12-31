@@ -3,50 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>预览测试 - 我们的时光胶囊</title>
+    <title>2026 · 我们的时光胶囊</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
     <style>
         :root { --paper: #f9f4ee; --ink: #2c2c2c; --romantic-red: #8b2b2b; --blue-dusk: #1a2a3a; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #111; font-family: 'Noto Serif SC', serif; color: var(--ink); overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Noto Serif SC', serif; color: var(--ink); background: #111; }
+        
         /* 复古噪点滤镜 */
         .film-grain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); opacity: 0.15; pointer-events: none; z-index: 100; }
         .container { height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #e6ddd3 0%, #b5a490 100%); perspective: 1000px; }
         
-        /* 卡片容器 */
+        /* 倒计时锁屏 */
+        #lock-screen { text-align: center; color: var(--romantic-red); z-index: 10; width: 85%; max-width: 400px; }
+        .timer-box { background: rgba(255, 255, 255, 0.4); padding: 40px 20px; border-radius: 20px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #timer { font-size: 2.8rem; font-weight: bold; display: block; margin-top: 20px; font-family: monospace; letter-spacing: 2px; }
+
+        /* 内容卡片 */
         .card { background: var(--paper); width: 88%; max-width: 480px; height: 85vh; padding: 30px 25px; border-radius: 4px; box-shadow: 0 10px 50px rgba(0,0,0,0.4); position: relative; display: none; overflow-y: auto; border: 1px solid #dcd3c9; }
         .active { display: block; animation: flipIn 1.2s ease-out forwards; }
         @keyframes flipIn { from { transform: rotateX(10deg) translateY(20px); opacity: 0; } to { transform: rotateX(0) translateY(0); opacity: 1; } }
         
-        /* 标题样式 */
-        h1 { font-family: 'Zhi Mang Xing', cursive; color: var(--romantic-red); text-align: center; font-size: 2.2rem; margin: 0 0 25px 0; font-weight: normal; border-bottom: 1px dashed rgba(139, 43, 43, 0.3); padding-bottom: 15px;}
+        h1 { font-family: 'Zhi Mang Xing', cursive; color: var(--romantic-red); text-align: center; font-size: 2.2rem; margin: 0 0 25px 0; font-weight: normal; border-bottom: 1px dashed rgba(139, 43, 43, 0.3); padding-bottom: 15px; }
         .sub-title { text-align: center; font-size: 0.7rem; color: #999; letter-spacing: 3px; margin-bottom: 10px; }
         
-        /* 正文样式 - 调整为段落模式 */
-        .content-box p {
-            line-height: 1.9; font-size: 1rem; text-align: justify; margin-bottom: 1.5em;
-            visibility: hidden; /* 默认隐藏，等JS来打印 */
-        }
-        /* 重点句高亮样式 */
-        .highlight {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--romantic-red);
-            text-align: center;
-            display: block;
-            margin-top: 30px;
-            line-height: 1.6;
-        }
+        /* 打印机文本样式 */
+        .content-box p { line-height: 2; font-size: 1.05rem; text-align: justify; margin-bottom: 1.5em; visibility: hidden; }
+        .highlight { font-size: 1.35rem; font-weight: 700; color: var(--romantic-red); text-align: center; display: block; margin-top: 35px; line-height: 1.6; border-top: 1px solid rgba(139, 43, 43, 0.1); padding-top: 20px; }
 
-        /* 照片框放在底部 */
-        .img-frame { margin-top: 30px; padding: 10px; background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.1); transform: rotate(-1deg); opacity: 0; transition: opacity 1s ease 0.5s; }
+        /* 照片和按钮 */
+        .img-frame { margin-top: 40px; padding: 12px; background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.1); transform: rotate(-1deg); opacity: 0; transition: opacity 1.5s ease; }
         .img-frame.show { opacity: 1; }
         .img-frame img { width: 100%; display: block; filter: sepia(0.15); }
-        
-        /* 按钮和漂浮物 */
-        .nav-btn { text-align: center; margin-top: 30px; padding-bottom: 30px; opacity: 0; transition: opacity 1s ease 1s;}
+        .nav-btn { text-align: center; margin-top: 30px; padding-bottom: 40px; opacity: 0; transition: opacity 1s ease; }
         .nav-btn.show { opacity: 1; }
-        button { background: var(--ink); color: #fff; border: none; padding: 12px 35px; border-radius: 30px; cursor: pointer; font-family: inherit; font-size: 1rem; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        button:hover { background: var(--romantic-red); transform: translateY(-2px); }
+        button { background: var(--ink); color: #fff; border: none; padding: 12px 40px; border-radius: 30px; cursor: pointer; font-family: inherit; font-size: 1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
         .float-item { position: absolute; pointer-events: none; z-index: 1; opacity: 0.3; animation: floatUp 12s linear infinite; }
         @keyframes floatUp { to { transform: translateY(-110vh) rotate(360deg); } }
     </style>
@@ -55,7 +46,16 @@
 <div class="film-grain"></div>
 <div class="container">
 
-    <div class="card active" id="p1">
+    <div id="lock-screen">
+        <div class="timer-box">
+            <h2 style="font-family: 'Zhi Mang Xing'; font-size: 2.2rem; margin:0;">致阿月老师</h2>
+            <p style="margin-top:10px; opacity:0.8;">2026 开启倒计时</p>
+            <span id="timer">00:00:00</span>
+            <div style="margin-top:30px; font-size:0.85rem; color:#888; letter-spacing:1px;">等到钟声敲响，这里会为你绽放 ✨</div>
+        </div>
+    </div>
+
+    <div class="card" id="p1">
         <div class="sub-title">CHAPTER I</div>
         <h1>南昌的拉链</h1>
         <div class="content-box" id="txt1">
@@ -103,81 +103,84 @@
             <p class="highlight" style="font-size: 1.5rem; margin-top: 40px;">我很喜欢你。<br>2026年，我也依然很喜欢你。</p>
         </div>
         <div class="img-frame"><img src="photo3.jpg" onerror="this.src='https://via.placeholder.com/400x300?text=Check+photo3.jpg'"></div>
-        <p style="text-align:center; font-family:'Zhi Mang Xing'; color:var(--romantic-red); font-size:1.2rem; margin-top: 30px; opacity: 0.7;">❤️ Happy New Year ❤️</p>
+        <p style="text-align:center; font-family:'Zhi Mang Xing'; color:var(--romantic-red); font-size:1.3rem; margin-top: 50px; opacity:0.8;">未来见 ❤️</p>
     </div>
 </div>
 
 <script>
-    // 打字机核心逻辑 (支持多段落顺序打印)
+    // 打字机逻辑
     async function typeWriter(containerId) {
         const container = document.getElementById(containerId);
         const paragraphs = container.querySelectorAll('p');
-        
-        // 锁定页面滚动，防止打字时页面乱跳
         container.closest('.card').style.overflowY = 'hidden';
 
         for (let p of paragraphs) {
-            const text = p.innerHTML; // 获取原始内容（包含<br>等）
-            p.innerHTML = ''; // 清空
-            p.style.visibility = 'visible'; // 显示段落框
-            
-            // 逐字打印
+            const text = p.innerHTML;
+            p.innerHTML = '';
+            p.style.visibility = 'visible';
             for (let i = 0; i < text.length; i++) {
-                // 如果遇到HTML标签（如<br>），直接添加，不延迟
                 if (text[i] === '<') {
                     const endIndex = text.indexOf('>', i);
                     p.innerHTML += text.slice(i, endIndex + 1);
                     i = endIndex;
                 } else {
                     p.innerHTML += text[i];
-                    // 打字速度设定：普通文字50ms，标点符号停顿久一点
-                    let speed = 50;
-                    if (['，', '。', '！', '？', '；'].includes(text[i])) speed = 150;
-                    await new Promise(r => setTimeout(r, speed));
+                    await new Promise(r => setTimeout(r, ['，','。','！'].includes(text[i])?150:50));
                 }
             }
-            // 段落间停顿
-            await new Promise(r => setTimeout(r, 300)); 
+            await new Promise(r => setTimeout(r, 400));
         }
-
-        // 全部打完，恢复滚动，显示照片和按钮
         container.closest('.card').style.overflowY = 'auto';
         container.parentElement.querySelector('.img-frame').classList.add('show');
-        const navBtn = container.parentElement.querySelector('.nav-btn');
-        if(navBtn) navBtn.classList.add('show');
+        const btn = container.parentElement.querySelector('.nav-btn');
+        if(btn) btn.classList.add('show');
     }
 
-    // 翻页逻辑
+    // 时间监控与翻页
+    let isUnlocked = false;
+    function update() {
+        const now = new Date();
+        const target = new Date('2026-01-01T00:00:00');
+        
+        if (now >= target) {
+            if (!isUnlocked) {
+                isUnlocked = true;
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('p1').classList.add('active');
+                setTimeout(() => typeWriter('txt1'), 1000);
+            }
+        } else {
+            const diff = target - now;
+            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            const m = String(Math.floor((diff / 60000) % 60)).padStart(2, '0');
+            const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+            document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+        }
+    }
+    setInterval(update, 1000); update();
+
     function go(n) {
         document.querySelector('.active').classList.remove('active');
         setTimeout(() => {
             const next = document.getElementById('p' + n);
             next.classList.add('active');
             next.scrollTop = 0;
-            // 翻页后开始打字
             typeWriter('txt' + n);
         }, 300);
     }
 
-    // 漂浮背景动画
-    const icons = ['❤️', '✨', '🍂', '🕰️'];
+    // 背景红心
+    const icons = ['❤️', '✨'];
     setInterval(() => {
         const d = document.createElement('div');
         d.className = 'float-item';
-        d.innerHTML = icons[Math.floor(Math.random()*icons.length)];
+        d.innerHTML = icons[Math.floor(Math.random()*2)];
         d.style.left = Math.random()*100+'vw';
         d.style.fontSize = (Math.random()*20+10)+'px';
         d.style.animationDuration = (Math.random()*5+10)+'s';
         document.body.appendChild(d);
         setTimeout(() => d.remove(), 10000);
-    }, 800);
-
-    // 页面加载完成后，开始打印第一页
-    window.onload = () => {
-        setTimeout(() => {
-            typeWriter('txt1');
-        }, 500);
-    };
+    }, 700);
 </script>
 </body>
 </html>
