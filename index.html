@@ -4,26 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>预览测试 - 我们的时光胶囊</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;600&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
     <style>
         :root { --paper: #f9f4ee; --ink: #2c2c2c; --romantic-red: #8b2b2b; --blue-dusk: #1a2a3a; }
         body, html { margin: 0; padding: 0; height: 100%; background: #111; font-family: 'Noto Serif SC', serif; color: var(--ink); overflow: hidden; }
+        /* 复古噪点滤镜 */
         .film-grain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); opacity: 0.15; pointer-events: none; z-index: 100; }
         .container { height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #e6ddd3 0%, #b5a490 100%); perspective: 1000px; }
         
-        /* 内容卡片 */
-        .card { background: var(--paper); width: 88%; max-width: 480px; height: 82vh; padding: 30px 20px; border-radius: 4px; box-shadow: 0 10px 50px rgba(0,0,0,0.4); position: relative; display: none; overflow-y: auto; border: 1px solid #dcd3c9; }
+        /* 卡片容器 */
+        .card { background: var(--paper); width: 88%; max-width: 480px; height: 85vh; padding: 30px 25px; border-radius: 4px; box-shadow: 0 10px 50px rgba(0,0,0,0.4); position: relative; display: none; overflow-y: auto; border: 1px solid #dcd3c9; }
         .active { display: block; animation: flipIn 1.2s ease-out forwards; }
         @keyframes flipIn { from { transform: rotateX(10deg) translateY(20px); opacity: 0; } to { transform: rotateX(0) translateY(0); opacity: 1; } }
         
-        h1 { font-family: 'Zhi Mang Xing', cursive; color: var(--romantic-red); text-align: center; font-size: 2.2rem; margin: 0 0 15px 0; }
+        /* 标题样式 */
+        h1 { font-family: 'Zhi Mang Xing', cursive; color: var(--romantic-red); text-align: center; font-size: 2.2rem; margin: 0 0 25px 0; font-weight: normal; border-bottom: 1px dashed rgba(139, 43, 43, 0.3); padding-bottom: 15px;}
         .sub-title { text-align: center; font-size: 0.7rem; color: #999; letter-spacing: 3px; margin-bottom: 10px; }
-        .content { line-height: 2.1; font-size: 0.95rem; text-align: justify; white-space: pre-wrap; padding-bottom: 60px; }
-        .img-frame { margin: 20px 0; padding: 10px; background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.1); transform: rotate(-1deg); }
-        .img-frame img { width: 100%; display: block; filter: sepia(0.1); }
-        .nav-btn { text-align: center; margin-top: 20px; padding-bottom: 20px; }
-        button { background: var(--ink); color: #fff; border: none; padding: 10px 30px; border-radius: 20px; cursor: pointer; font-family: inherit; }
-        .float-item { position: absolute; pointer-events: none; z-index: 1; opacity: 0.3; animation: floatUp 10s linear infinite; }
+        
+        /* 正文样式 - 调整为段落模式 */
+        .content-box p {
+            line-height: 1.9; font-size: 1rem; text-align: justify; margin-bottom: 1.5em;
+            visibility: hidden; /* 默认隐藏，等JS来打印 */
+        }
+        /* 重点句高亮样式 */
+        .highlight {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--romantic-red);
+            text-align: center;
+            display: block;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        /* 照片框放在底部 */
+        .img-frame { margin-top: 30px; padding: 10px; background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.1); transform: rotate(-1deg); opacity: 0; transition: opacity 1s ease 0.5s; }
+        .img-frame.show { opacity: 1; }
+        .img-frame img { width: 100%; display: block; filter: sepia(0.15); }
+        
+        /* 按钮和漂浮物 */
+        .nav-btn { text-align: center; margin-top: 30px; padding-bottom: 30px; opacity: 0; transition: opacity 1s ease 1s;}
+        .nav-btn.show { opacity: 1; }
+        button { background: var(--ink); color: #fff; border: none; padding: 12px 35px; border-radius: 30px; cursor: pointer; font-family: inherit; font-size: 1rem; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        button:hover { background: var(--romantic-red); transform: translateY(-2px); }
+        .float-item { position: absolute; pointer-events: none; z-index: 1; opacity: 0.3; animation: floatUp 12s linear infinite; }
         @keyframes floatUp { to { transform: translateY(-110vh) rotate(360deg); } }
     </style>
 </head>
@@ -34,76 +58,109 @@
     <div class="card active" id="p1">
         <div class="sub-title">CHAPTER I</div>
         <h1>南昌的拉链</h1>
+        <div class="content-box" id="txt1">
+            <p>2022年，南昌的秋天，天气忽冷忽热。新东方教室里的你，画风总和别人不太一样。</p>
+            <p>我没勇气上前，托了小王的女朋友，才要到你的联系方式。</p>
+            <p>那年冬天的一个晚上，下自习后约你吃东西。风很硬，你穿得薄，我脱下外衣披在你身上。拉拉链的时候，我的手一直在抖。那是我第一次离你那么近。</p>
+            <p>可惜那天缘分还没具足，我们没能走下去。</p>
+            <p>后来，二战落榜。我回了重庆，在医院规培，每天像牛马一样忙碌。23年入秋的一天，你在微信里说，你梦到了我。</p>
+            <p>我在值班室昏暗的灯光下盯着屏幕。文字打了又删，删了又打，怕没话找话，又怕就此失去。那些反复琢磨的字句，在深夜里显得张牙舞爪。</p>
+            <p>我就这样一直在你面前晃，晃了很久，你终于注意到了我。</p>
+            <p class="highlight">后来我常想起南昌那个冬天。那串拉了很久、没能拉到头的拉链，在两年后，终于扣上了。</p>
+        </div>
         <div class="img-frame"><img src="photo1.jpg" onerror="this.src='https://via.placeholder.com/400x300?text=Check+photo1.jpg'"></div>
-        <div class="content">2022年，南昌的秋天，天气忽冷忽热。新东方教室里的你，画风总和别人不太一样。
-
-我没勇气上前，托了小王的女朋友，才要到你的联系方式。
-
-那年冬天的一个晚上，下自习后约你吃东西。风很硬，你穿得薄，我脱下外衣披在你身上。拉拉链的时候，我的手一直在抖。那是我第一次离你那么近。
-
-可惜那天缘分还没具足，我们没能走下去。
-
-后来，二战落榜。我回了重庆，在医院规培，每天像牛马一样忙碌。23年入秋的一天，你在微信里说，你梦到了我。
-
-我在值班室昏暗的灯光下盯着屏幕。文字打了又删，删了又打，怕没话找话，又怕就此失去。那些反复琢磨的字句，在深夜里显得张牙舞爪。
-
-我就这样一直在你面前晃，晃了很久，你终于注意到了我。
-
-后来我常想起南昌那个冬天。那串拉了很久、没能拉到头的拉链，在两年后，终于扣上了。</div>
         <div class="nav-btn"><button onclick="go(2)">翻开下一章</button></div>
     </div>
 
-    <div class="card" id="p2" style="background:#f0f4f8">
+    <div class="card" id="p2" style="background:#f2f5f9">
         <div class="sub-title">CHAPTER II</div>
         <h1 style="color:var(--blue-dusk)">深蓝色的烛火</h1>
+        <div class="content-box" id="txt2">
+            <p>2025年4月11日，你的一句玩笑话，我稳稳地接住了。</p>
+            <p>那天我在安徽，头晚刚陪导师喝了酒，第二天去爬山。仰头看那座高峰，我觉得就算宿醉也能翻过去。那时候的我，好像有使不完的劲。</p>
+            <p>5月，我每天在实验室、仓库和网店之间连轴转。夕阳斜着照进车窗，落在方向盘上，也落在视频通话里的你脸上。手机被烧得滚烫，我的心也是。</p>
+            <p>可高强度的工作还是压垮了身体。5月底确诊生病，误诊的信息很吓人，说治疗后会掉光头发。我急着赶去见你，想让你记住我还没变丑的样子。那段日子，我们流了很多泪。</p>
+            <p>那天晚上，屋里是深蓝色的傍晚，桌上摇曳着红色的烛光。你问我为什么不提分手。我实话实说：我怕，我自私，我怕提了就真的没了。那样的话，在生命最后的阶段，我会好难过。原谅我的自私，宝宝。</p>
+            <p>后来开始治疗，头发大把大把地掉。你一次次飞来重庆，我们去大学城，逛各种展，找好吃的店。到了现在，身体具体的痛苦我已经记不清了，但我记得你陪我吃过的每一种味道，看过的每一处风景。</p>
+            <p>2025年10月17日，秋天彻底来了，我的治疗也宣告结束。</p>
+            <p class="highlight">谢谢你，陪我翻过了那座最陡峭的山。</p>
+        </div>
         <div class="img-frame" style="transform: rotate(1deg);"><img src="photo2.jpg" onerror="this.src='https://via.placeholder.com/400x300?text=Check+photo2.jpg'"></div>
-        <div class="content">2025年4月11日，你的一句玩笑话，我稳稳地接住了。
-
-那天我在安徽，头晚刚陪导师喝了酒，第二天去爬山。仰头看那座高峰，我觉得就算宿醉也能翻过去。那时候的我，好像有使不完的劲。
-
-5月，我每天在实验室、仓库和网店之间连轴转。夕阳斜着照进车窗，落在方向盘上，也落在视频通话里的你脸上。手机被烧得滚烫，我的心也是。
-
-可高强度的工作还是压垮了身体。5月底确诊生病，误诊的信息很吓人，说治疗后会掉光头发。我急着赶去见你，想让你记住我还没变丑的样子。那段日子，我们流了很多泪。
-
-那天晚上，屋里是深蓝色的傍晚，桌上摇曳着红色的烛光。你问我为什么不提分手。我实话说：我怕，我自私，我怕提了就真的没了。那样的话，在生命最后的阶段，我会好难过。原谅我的自私，宝宝。
-
-后来开始治疗，头发大把大把地掉。你一次次飞来重庆，我们去大学城，逛各种展，找好吃的店。到了现在，身体具体的痛苦我已经记不清了，但我记得你陪我吃过的每一种味道，看过的每一处风景。
-
-2025年10月17日，秋天彻底来了，我的治疗也宣告结束。谢谢你，陪我翻过了那座最陡峭的山。</div>
         <div class="nav-btn"><button onclick="go(3)">进入终章</button></div>
     </div>
 
     <div class="card" id="p3">
         <div class="sub-title">FINAL CHAPTER</div>
         <h1>2026 的烟火气</h1>
+        <div class="content-box" id="txt3">
+            <p>结疗后在家休息了一个月。我关掉了网店，把心收回实验室，每天没日没夜地守着实验台、跑数据、磨论文。总觉得这半年时间是偷来的，想拼命把进度赶回来。</p>
+            <p>忙起来的时候，我总忘了告诉你我在做什么，直到你发来消息问起，我才猛然惊觉。对不起，宝宝，我一定改正。</p>
+            <p>现在的我恢复期胃口很好，所以总爱问你“在干嘛”、“吃了啥”，像个复读机一样让你多吃点。我希望你的胃口也能像我一样好。</p>
+            <p>阿月老师，小许同学，Sharon老师。你说你是个“寡淡”的人，口味淡，性子也淡。但在我眼里，和你一起可有意思了。你的看法总能补充我的缺失，你的爱好我想抽空深入了解。你性格很好很温柔，我觉得这份温柔应该就是只给我一个人的。</p>
+            <p>明年我们要搬进新家了。空闲的时候，你一定要多来住住。</p>
+            <p>我想和你一起站在厨房里做饭，坐在桌边吃饭。看你感兴趣但我看不懂的，我喜欢但是你不感兴趣的电影电视剧，但是只要是和你一起，就很好。</p>
+            <p>2025年就要过去了。</p>
+            <p class="highlight" style="font-size: 1.5rem; margin-top: 40px;">我很喜欢你。<br>2026年，我也依然很喜欢你。</p>
+        </div>
         <div class="img-frame"><img src="photo3.jpg" onerror="this.src='https://via.placeholder.com/400x300?text=Check+photo3.jpg'"></div>
-        <div class="content">结疗后在家休息了一个月。我关掉了网店，把心收回实验室，每天没日没夜地守着实验台、跑数据、磨论文。总觉得这半年时间是偷来的，想拼命把进度赶回来。
-
-忙起来的时候，我总忘了告诉你我在做什么，直到你发来消息问起，我才猛然惊觉。对不起，宝宝，我一定改正。
-
-现在的我恢复期胃口很好，所以总爱问你“在干嘛”、“吃了啥”，像个复读机一样让你多吃点。我希望你的胃口也能像我一样好。
-
-阿月老师，小许同学，Sharon老师。你说你是个“寡淡”的人，口味淡，性子也淡。但在我眼里，和你一起可有意思了。你的看法总能补充我的缺失，你的爱好我想抽空深入了解。你性格很好很温柔，我觉得这份温柔应该就是只给我一个人的。
-
-明年我们要搬进新家了。空闲的时候，你一定要多来住住。
-
-我想和你一起站在厨房里做饭，坐在桌边吃饭。看你感兴趣但我看不懂的，我喜欢但是你不感兴趣的电影电视剧，但是只要是和你一起，就很好。
-
-2025年就要过去了。我很喜欢你。2026年，我也依然很喜欢你。</div>
-        <p style="text-align:center; font-family:'Zhi Mang Xing'; color:var(--romantic-red); font-size:1.5rem; margin-top: 30px;">❤️ Happy New Year ❤️</p>
+        <p style="text-align:center; font-family:'Zhi Mang Xing'; color:var(--romantic-red); font-size:1.2rem; margin-top: 30px; opacity: 0.7;">❤️ Happy New Year ❤️</p>
     </div>
 </div>
 
 <script>
+    // 打字机核心逻辑 (支持多段落顺序打印)
+    async function typeWriter(containerId) {
+        const container = document.getElementById(containerId);
+        const paragraphs = container.querySelectorAll('p');
+        
+        // 锁定页面滚动，防止打字时页面乱跳
+        container.closest('.card').style.overflowY = 'hidden';
+
+        for (let p of paragraphs) {
+            const text = p.innerHTML; // 获取原始内容（包含<br>等）
+            p.innerHTML = ''; // 清空
+            p.style.visibility = 'visible'; // 显示段落框
+            
+            // 逐字打印
+            for (let i = 0; i < text.length; i++) {
+                // 如果遇到HTML标签（如<br>），直接添加，不延迟
+                if (text[i] === '<') {
+                    const endIndex = text.indexOf('>', i);
+                    p.innerHTML += text.slice(i, endIndex + 1);
+                    i = endIndex;
+                } else {
+                    p.innerHTML += text[i];
+                    // 打字速度设定：普通文字50ms，标点符号停顿久一点
+                    let speed = 50;
+                    if (['，', '。', '！', '？', '；'].includes(text[i])) speed = 150;
+                    await new Promise(r => setTimeout(r, speed));
+                }
+            }
+            // 段落间停顿
+            await new Promise(r => setTimeout(r, 300)); 
+        }
+
+        // 全部打完，恢复滚动，显示照片和按钮
+        container.closest('.card').style.overflowY = 'auto';
+        container.parentElement.querySelector('.img-frame').classList.add('show');
+        const navBtn = container.parentElement.querySelector('.nav-btn');
+        if(navBtn) navBtn.classList.add('show');
+    }
+
+    // 翻页逻辑
     function go(n) {
         document.querySelector('.active').classList.remove('active');
         setTimeout(() => {
             const next = document.getElementById('p' + n);
             next.classList.add('active');
             next.scrollTop = 0;
+            // 翻页后开始打字
+            typeWriter('txt' + n);
         }, 300);
     }
-    const icons = ['❤️', '✨', '🕰️'];
+
+    // 漂浮背景动画
+    const icons = ['❤️', '✨', '🍂', '🕰️'];
     setInterval(() => {
         const d = document.createElement('div');
         d.className = 'float-item';
@@ -114,6 +171,13 @@
         document.body.appendChild(d);
         setTimeout(() => d.remove(), 10000);
     }, 800);
+
+    // 页面加载完成后，开始打印第一页
+    window.onload = () => {
+        setTimeout(() => {
+            typeWriter('txt1');
+        }, 500);
+    };
 </script>
 </body>
 </html>
